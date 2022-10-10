@@ -1,13 +1,24 @@
-import express from "express";
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+
+const PORT = process.env.PORT || 3002;
 
 const app = express();
 
-const port = 3002;
+app.use(express.json());
+app.use(cors());
 
 app.use("/", (req, res) => {
   res.json({ message: "Hello From Express App" });
 });
 
-app.listen(9000, () => {
-  console.log(`Starting Server on Port ${port}`);
+mongoose
+  .connect(process.env.DB_URL)
+  .then(() => console.log("Connected to DB"))
+  .catch((error) => console.log(error));
+
+app.listen(PORT, (error) => {
+  error ? console.log(error) : console.log(`Starting Server on Port ${PORT}`);
 });
