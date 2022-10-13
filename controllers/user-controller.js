@@ -52,6 +52,37 @@ class UserController {
       next(e);
     }
   }
+
+  async login(req, res, next) {
+    try {
+      const { username, password } = req.body;
+      const userData = await userService.login(username, password);
+      return res.json(userData);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async getStats(req, res, next) {
+    try {
+      const { id } = req.body;
+      const userData = await userService.getStats(id);
+      return res.json(userData);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async updateStats(req, res, next) {
+    try {
+      const { id, stats } = req.body;
+      const userData = await userService.updateStats(id, stats);
+      return res.json(userData);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async getUsers(req, res, next) {
     try {
       const users = await userService.getAllUsers();
