@@ -2,44 +2,6 @@ const userService = require("../service/user-service");
 const { validationResult } = require("express-validator");
 const ApiError = require("../exceptions/api-error");
 
-const statsDefault = {
-  win: 0,
-  loss: 0,
-  surrender: 0,
-  bar: [
-    {
-      name: 1,
-      percent: "0%",
-      count: 0,
-    },
-    {
-      name: 2,
-      percent: "0%",
-      count: 0,
-    },
-    {
-      name: 3,
-      percent: "0%",
-      count: 0,
-    },
-    {
-      name: 4,
-      percent: "0%",
-      count: 0,
-    },
-    {
-      name: 5,
-      percent: "0%",
-      count: 0,
-    },
-    {
-      name: 6,
-      percent: "0%",
-      count: 0,
-    },
-  ],
-};
-
 class UserController {
   async registration(req, res, next) {
     try {
@@ -110,20 +72,20 @@ class UserController {
     }
   }
 
-  async getStats(req, res, next) {
+  async getStatistics(req, res, next) {
     try {
       const { id } = req.body;
-      const userData = await userService.getStats(id);
+      const userData = await userService.getStatistics(id);
       return res.json(userData);
     } catch (e) {
       next(e);
     }
   }
 
-  async updateStats(req, res, next) {
+  async updateStatistics(req, res, next) {
     try {
-      const { id, stats } = req.body;
-      const userData = await userService.updateStats(id, stats);
+      const { id, statistics } = req.body;
+      const userData = await userService.updateStatistics(id, statistics);
       return res.json(userData);
     } catch (e) {
       next(e);

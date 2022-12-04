@@ -3,51 +3,11 @@ const bcrypt = require("bcrypt");
 const uuid = require("uuid");
 // const mailService = require("./mail-service");
 const tokenService = require("./token-service");
-const statisticsService = require("./statistics-service");
 const UserDto = require("../dtos/user-dto");
 const ApiError = require("../exceptions/api-error");
 
-const initialStatistics = {
-  win: 0,
-  loss: 0,
-  surrender: 0,
-  bar: [
-    {
-      name: 1,
-      percent: "0%",
-      count: 0,
-    },
-    {
-      name: 2,
-      percent: "0%",
-      count: 0,
-    },
-    {
-      name: 3,
-      percent: "0%",
-      count: 0,
-    },
-    {
-      name: 4,
-      percent: "0%",
-      count: 0,
-    },
-    {
-      name: 5,
-      percent: "0%",
-      count: 0,
-    },
-    {
-      name: 6,
-      percent: "0%",
-      count: 0,
-    },
-  ],
-};
-
 class UserService {
   async registration(email, password, statistics) {
-    console.log(statistics);
     const candidate = await UserModel.findOne({ email });
     if (candidate) {
       throw ApiError.BadRequest(
@@ -56,32 +16,20 @@ class UserService {
     }
     const hashPassword = await bcrypt.hash(password, 3);
     const activationLink = uuid.v4();
-
     const user = await UserModel.create({
       email,
       password: hashPassword,
       activationLink,
+      statistics,
     });
     // await mailService.sendActivationMail(
     //   email,
     //   `${process.env.API_URL}/api/activate/${activationLink}`
     // );
-
     const userDto = new UserDto(user);
     const tokens = tokenService.generateTokens({ ...userDto });
-    await statisticsService.saveStatistics(userDto.id, statistics);
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
-
-    return { ...tokens, user: userDto, statistics };
-  }
-
-  async activate(activationLink) {
-    const user = await UserModel.findOne({ activationLink });
-    if (!user) {
-      throw ApiError.BadRequest("Неккоректная ссылка активации");
-    }
-    user.isActivated = true;
-    await user.save();
+    return { ...tokens, user: userDto };
   }
 
   async login(email, password) {
@@ -95,7 +43,6 @@ class UserService {
     }
     const userDto = new UserDto(user);
     const tokens = tokenService.generateTokens({ ...userDto });
-
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return { ...tokens, user: userDto };
   }
@@ -103,6 +50,15 @@ class UserService {
   async logout(refreshToken) {
     const token = await tokenService.removeToken(refreshToken);
     return token;
+  }
+
+  async activate(activationLink) {
+    const user = await UserModel.findOne({ activationLink });
+    if (!user) {
+      throw ApiError.BadRequest("Неккоректная ссылка активации");
+    }
+    user.isActivated = true;
+    await user.save();
   }
 
   async refresh(refreshToken) {
@@ -122,28 +78,27 @@ class UserService {
     return { ...tokens, user: userDto };
   }
 
-  // async getStats(id) {
-  //   const _id = id;
-  //   const user = await UserModel.findById({ _id });
-  //   if (!_id) {
-  //     throw ApiError.BadRequest("Пользователь с таким id не найден");
-  //   }
-  //   const userDto = new UserDto(user);
-  //   return { stats: userDto.stats };
-  // }
+  async getStatistics(id) {
+    const _id = id;
+    const user = await UserModel.findById({ _id });
+    if (!_id) {
+      throw ApiError.BadRequest("Пользователь не найден");
+    }
+    return user.statistics;
+  }
 
-  // async updateStats(id, stats) {
-  //   const user = await UserModel.findByIdAndUpdate(
-  //     id,
-  //     { stats },
-  //     { returnDocument: "after" }
-  //   );
-  //   if (!id) {
-  //     throw ApiError.BadRequest("Пользователь с таким id не найден");
-  //   }
-  //   const userDto = new UserDto(user);
-  //   return { user: userDto.stats };
-  // }
+  async updateStatistics(id, statistics) {
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      { statistics },
+      { returnDocument: "after" }
+    );
+    if (!id) {
+      throw ApiError.BadRequest("Пользователь не найден");
+    }
+    const userDto = new UserDto(user);
+    return userDto.statistics;
+  }
 
   async getAllUsers() {
     const users = await UserModel.find();
