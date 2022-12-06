@@ -11,8 +11,12 @@ class UserController {
           ApiError.BadRequest("Ошибка при валидации", errors.array())
         );
       }
-      const { email, password, stats } = req.body;
-      const userData = await userService.registration(email, password, stats);
+      const { email, password, statistics } = req.body;
+      const userData = await userService.registration(
+        email,
+        password,
+        statistics
+      );
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
@@ -48,15 +52,15 @@ class UserController {
     }
   }
 
-  async activate(req, res, next) {
-    try {
-      const activationLink = req.params.link;
-      await userService.activate(activationLink);
-      return res.redirect(process.env.CLIENT_URL);
-    } catch (e) {
-      next(e);
-    }
-  }
+  // async activate(req, res, next) {
+  //   try {
+  //     const activationLink = req.params.link;
+  //     await userService.activate(activationLink);
+  //     return res.redirect(process.env.CLIENT_URL);
+  //   } catch (e) {
+  //     next(e);
+  //   }
+  // }
 
   async refresh(req, res, next) {
     try {
@@ -66,16 +70,6 @@ class UserController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      return res.json(userData);
-    } catch (e) {
-      next(e);
-    }
-  }
-
-  async getStatistics(req, res, next) {
-    try {
-      const { id } = req.body;
-      const userData = await userService.getStatistics(id);
       return res.json(userData);
     } catch (e) {
       next(e);
@@ -92,14 +86,14 @@ class UserController {
     }
   }
 
-  async getUsers(req, res, next) {
-    try {
-      const users = await userService.getAllUsers();
-      return res.json(users);
-    } catch (e) {
-      next(e);
-    }
-  }
+  // async getUsers(req, res, next) {
+  //   try {
+  //     const users = await userService.getAllUsers();
+  //     return res.json(users);
+  //   } catch (e) {
+  //     next(e);
+  //   }
+  // }
 }
 
 module.exports = new UserController();

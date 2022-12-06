@@ -78,15 +78,6 @@ class UserService {
     return { ...tokens, user: userDto };
   }
 
-  async getStatistics(id) {
-    const _id = id;
-    const user = await UserModel.findById({ _id });
-    if (!_id) {
-      throw ApiError.BadRequest("Пользователь не найден");
-    }
-    return user.statistics;
-  }
-
   async updateStatistics(id, statistics) {
     const user = await UserModel.findByIdAndUpdate(
       id,
@@ -100,10 +91,10 @@ class UserService {
     return userDto.statistics;
   }
 
-  async getAllUsers() {
-    const users = await UserModel.find();
-    return users;
-  }
+  // async getAllUsers() {
+  //   const users = await UserModel.find();
+  //   return users;
+  // }
 }
 
 module.exports = new UserService();
