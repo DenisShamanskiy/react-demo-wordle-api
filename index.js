@@ -9,21 +9,26 @@ const PORT = process.env.PORT || 3002;
 
 const app = express();
 
-const whitelist = process.env.CLIENT_URL_LIST.split(",").map((origin) =>
-  origin.trim()
-);
+// const whitelist = process.env.CLIENT_URL_LIST.split(",").map((origin) =>
+//   origin.trim()
+// );
 
-const corsOptions = {
-  credentials: true,
-  origin: (origin, callback) => {
-    whitelist.includes(origin)
-      ? callback(null, true)
-      : callback(new Error("Not allowed by CORS"));
-  },
-};
+// const corsOptions = {
+//   credentials: true,
+//   origin: (origin, callback) => {
+//     whitelist.includes(origin)
+//       ? callback(null, true)
+//       : callback(new Error("Not allowed by CORS"));
+//   },
+// };
 
 app.use(express.json());
-app.use(cors({ corsOptions }));
+app.use(
+  cors({
+    credentials: true,
+    origin: process.env.CLIENT_URL,
+  })
+);
 
 app.use("/api", router);
 app.use(errorMiddleware);
