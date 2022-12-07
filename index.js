@@ -26,7 +26,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use("/api", router);
-app.use(errorMiddleware);
 
 mongoose
   .connect(process.env.DB_URL)
