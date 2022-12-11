@@ -12,9 +12,9 @@ router.post(
 );
 router.post("/login", userController.login);
 router.post("/logout", userController.logout);
-// router.get("/activate/:link", userController.activate);
+router.get("/activate/:link", userController.activate);
 router.get("/refresh", userController.refresh);
-// router.get("/users", authMiddleware, userController.getUsers);
+router.get("/users", authMiddleware, userController.getUsers);
 router.put("/user/statistics", authMiddleware, userController.updateStatistics);
 
 module.exports = router;
