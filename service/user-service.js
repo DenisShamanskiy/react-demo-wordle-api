@@ -19,6 +19,7 @@ class UserService {
     const user = await UserModel.create({
       email,
       password: hashPassword,
+      username: email,
       activationLink,
       statistics,
     });
@@ -89,6 +90,19 @@ class UserService {
     }
     const userDto = new UserDto(user);
     return userDto.statistics;
+  }
+
+  async updateUser(id, username, email) {
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      { username, email },
+      { returnDocument: "after" }
+    );
+    if (!id) {
+      throw ApiError.BadRequest("Пользователь не найден");
+    }
+    const userDto = new UserDto(user);
+    return userDto;
   }
 
   async getAllUsers() {

@@ -87,6 +87,16 @@ class UserController {
     }
   }
 
+  async updateUser(req, res, next) {
+    try {
+      const { id, username, email } = req.body;
+      const userData = await userService.updateUser(id, username, email);
+      return res.json(userData);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async getUsers(req, res, next) {
     try {
       const users = await userService.getAllUsers();
