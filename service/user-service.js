@@ -1,7 +1,8 @@
 const UserModel = require("../models/user-model");
+const RoleModel = require("../models/role-model");
 const bcrypt = require("bcrypt");
 const uuid = require("uuid");
-const mailService = require("./mail-service");
+// const mailService = require("./mail-service");
 const tokenService = require("./token-service");
 const UserDto = require("../dtos/user-dto");
 const ApiError = require("../exceptions/api-error");
@@ -16,17 +17,19 @@ class UserService {
     }
     const hashPassword = await bcrypt.hash(password, 3);
     const activationLink = uuid.v4();
+    const userRole = await RoleModel.findOne({ value: "USER" });
     const user = await UserModel.create({
       email,
       password: hashPassword,
       username: email,
       activationLink,
       statistics,
+      roles: [userRole.value],
     });
-    await mailService.sendActivationMail(
-      email,
-      `${process.env.API_URL}/api/activate/${activationLink}`
-    );
+    // await mailService.sendActivationMail(
+    //   email,
+    //   `${process.env.API_URL}/api/activate/${activationLink}`
+    // );
     const userDto = new UserDto(user);
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
@@ -36,7 +39,7 @@ class UserService {
   async login(email, password) {
     const user = await UserModel.findOne({ email });
     if (!user) {
-      throw ApiError.BadRequest("Пользователь с таким email не найден");
+      throw ApiError.BadRequest(`Пользователь не найден`);
     }
     const isPassEquals = await bcrypt.compare(password, user.password);
     if (!isPassEquals) {

@@ -6,6 +6,7 @@ const UserSchema = new Schema({
   username: { type: String },
   isActivated: { type: Boolean, default: false },
   activationLink: { type: String },
+  roles: [{ type: String, ref: "Role" }],
   statistics: {
     bar: [
       {
