@@ -18,45 +18,65 @@ class WordService {
 
   async getWords() {
     try {
-      const [BD] = await WordModel.find();
-      return BD;
+      const [data] = await WordModel.find();
+      return data.words;
     } catch (error) {
       console.log(error);
     }
   }
 
-  async addNewWord(id, word) {
+  // async addNewWord(word) {
+  //   try {
+  //     const [data] = await WordModel.find();
+  //     if (!data) {
+  //       throw ApiError.BadRequest(`База слов не найдена`);
+  //     }
+  //     if (data.words.includes(word)) {
+  //       throw ApiError.BadRequest(
+  //         `Слово "${word.toUpperCase()}" уже есть в базе данных`
+  //       );
+  //     }
+  //     data.words.push(word);
+  //     await data.save();
+  //     return { status: 200 };
+  //   } catch (error) {
+  //     console.log(error);
+  //     return error;
+  //   }
+  // }
+
+  async addWord(word) {
     try {
-      const BD = await WordModel.findById(id);
-      if (!id) {
-        throw ApiError.BadRequest(`База слов по ID ${id} не найдена`);
+      const database = await WordModel.findById({
+        _id: process.env.ID_DATABASE,
+      });
+      if (!database) {
+        throw ApiError.BadRequest(`База слов не найдена`);
       }
-      if (BD.words.includes(word)) {
+      if (database.words.includes(word)) {
         throw ApiError.BadRequest(
-          `Слово ${word} уже есть в базе данных с ID ${id}`
+          `Слово "${word.toUpperCase()}" уже есть в списке`
         );
       }
-      BD.words.push(word);
-      await BD.save();
-      return BD;
+      database.words.push(word);
+      await database.save();
+      return { status: 200 };
     } catch (error) {
       console.log(error);
+      return error;
     }
   }
 
-  async deleteWord(id, word) {
+  async deleteWord(word) {
     try {
-      const BD = await WordModel.findByIdAndUpdate(
-        { _id: id },
-        { $pull: { words: word } },
-        { new: true }
+      const { words } = await WordModel.findByIdAndUpdate(
+        { _id: process.env.ID_DATABASE },
+        { $pull: { words: word } }
       );
-      if (!id) {
-        throw ApiError.BadRequest(`База слов по ID ${id} не найдена`);
-      }
-      return BD;
-    } catch (e) {
-      console.log(e);
+      return { status: 200 };
+    } catch (error) {
+      console.log(error);
+      return error;
     }
   }
 }

@@ -8,7 +8,7 @@ const UserDto = require("../dtos/user-dto");
 const ApiError = require("../exceptions/api-error");
 
 class UserService {
-  async registration(email, password, statistics) {
+  async registration(email, password) {
     const candidate = await UserModel.findOne({ email });
     if (candidate) {
       throw ApiError.BadRequest(
@@ -23,14 +23,15 @@ class UserService {
       password: hashPassword,
       username: email,
       activationLink,
-      statistics,
       roles: [userRole.value],
     });
     // await mailService.sendActivationMail(
     //   email,
     //   `${process.env.API_URL}/api/activate/${activationLink}`
     // );
+    console.log(user);
     const userDto = new UserDto(user);
+    console.log(userDto);
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return { ...tokens, user: userDto };
@@ -111,6 +112,19 @@ class UserService {
   async getAllUsers() {
     const users = await UserModel.find();
     return users;
+  }
+  async getUser(id) {
+    const user = await UserModel.findById(id);
+    return user;
+  }
+  async deleteUser(id) {
+    try {
+      const { user } = await UserModel.findByIdAndDelete(id);
+      return { status: 200 };
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
 }
 

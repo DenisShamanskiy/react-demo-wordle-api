@@ -16,16 +16,18 @@ router.post("/login", userController.login);
 router.post("/logout", userController.logout);
 router.get("/activate/:link", userController.activate);
 router.get("/refresh", userController.refresh);
-router.get("/users", roleMiddleware(["ADMIN"]), userController.getUsers);
-router.get("/admin/words", roleMiddleware(["USER"]), wordController.getWords);
-// router.get("/admin/words/add", wordController.addWords);
-router.put(
-  "/admin/words/add-word",
+router.get("/users", roleMiddleware(["USER"]), userController.getUsers);
+router.get("/users/:id", roleMiddleware(["ADMIN"]), userController.getUser);
+router.delete(
+  "/users/:id",
   roleMiddleware(["ADMIN"]),
-  wordController.addNewWord
+  userController.deleteUser
 );
-router.put(
-  "/admin/words/delete-word",
+router.get("/words", wordController.getWords);
+// router.get("/admin/words/add", wordController.addWords);
+router.patch("/words/add", roleMiddleware(["ADMIN"]), wordController.addWord);
+router.patch(
+  "/words/delete",
   roleMiddleware(["ADMIN"]),
   wordController.deleteWord
 );

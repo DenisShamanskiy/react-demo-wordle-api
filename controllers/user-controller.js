@@ -11,12 +11,8 @@ class UserController {
           ApiError.BadRequest("Ошибка при валидации", errors.array())
         );
       }
-      const { email, password, statistics } = req.body;
-      const userData = await userService.registration(
-        email,
-        password,
-        statistics
-      );
+      const { email, password } = req.body;
+      const userData = await userService.registration(email, password);
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
@@ -107,6 +103,24 @@ class UserController {
     try {
       const users = await userService.getAllUsers();
       return res.json(users);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async getUser(req, res, next) {
+    try {
+      const user = await userService.getUser(req.params.id);
+      return res.json(user);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async deleteUser(req, res, next) {
+    try {
+      const result = await userService.deleteUser(req.params.id);
+      return res.json(result);
     } catch (e) {
       next(e);
     }
