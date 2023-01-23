@@ -111,15 +111,17 @@ class UserService {
 
   async getAllUsers() {
     const users = await UserModel.find();
-    return users;
+    return users.map((user) => new UserDto(user));
   }
+
   async getUser(id) {
     const user = await UserModel.findById(id);
-    return user;
+    return new UserDto(user);
   }
+
   async deleteUser(id) {
     try {
-      const { user } = await UserModel.findByIdAndDelete(id);
+      await UserModel.findByIdAndDelete(id);
       return { status: 200 };
     } catch (error) {
       console.log(error);
