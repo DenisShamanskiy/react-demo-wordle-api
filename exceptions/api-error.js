@@ -20,4 +20,8 @@ module.exports = class ApiError extends Error {
   static Forbidden(errors = []) {
     return new ApiError(403, "В доступе отказано", errors);
   }
+
+  static NotFound(message = "Запрашиваемый ресурс не найден") {
+    return new ApiError(404, message);
+  }
 };

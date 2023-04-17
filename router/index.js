@@ -1,8 +1,8 @@
 const Router = require("express").Router;
+const { body } = require("express-validator");
+const router = new Router();
 const userController = require("../controllers/user-controller");
 const wordController = require("../controllers/word-controller");
-const router = new Router();
-const { body } = require("express-validator");
 const authMiddleware = require("../middlewares/auth-middleware");
 const roleMiddleware = require("../middlewares/role-middleware");
 
@@ -18,13 +18,8 @@ router.get("/activate/:link", userController.activate);
 router.get("/refresh", userController.refresh);
 router.get("/users", roleMiddleware(["USER"]), userController.getUsers);
 router.get("/users/:id", roleMiddleware(["ADMIN"]), userController.getUser);
-router.delete(
-  "/users/:id",
-  roleMiddleware(["ADMIN"]),
-  userController.deleteUser
-);
+router.delete("/users/:id", userController.deleteUser);
 router.get("/words", wordController.getWords);
-// router.get("/admin/words/add", wordController.addWords);
 router.patch("/words/add", roleMiddleware(["ADMIN"]), wordController.addWord);
 router.patch(
   "/words/delete",

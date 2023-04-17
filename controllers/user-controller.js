@@ -19,9 +19,9 @@ class UserController {
         sameSite: "None",
         secure: true,
       });
-      return res.json(userData);
-    } catch (e) {
-      next(e);
+      return res.status(200).json(userData);
+    } catch (error) {
+      next(error);
     }
   }
 
@@ -35,9 +35,9 @@ class UserController {
         sameSite: "None",
         secure: true,
       });
-      return res.json(userData);
-    } catch (e) {
-      next(e);
+      return res.status(200).json(userData);
+    } catch (error) {
+      next(error);
     }
   }
 
@@ -46,20 +46,20 @@ class UserController {
       const { refreshToken } = req.cookies;
       const token = await userService.logout(refreshToken);
       res.clearCookie("refreshToken");
-      return res.json(token);
-    } catch (e) {
-      next(e);
+      return res.status(200).json(token);
+    } catch (error) {
+      next(error);
     }
   }
 
   async activate(req, res, next) {
     try {
-      const activationLink = req.params.link;
-      await userService.activate(activationLink);
-      console.log(res);
-      return res.redirect(process.env.CLIENT_URL);
-    } catch (e) {
-      next(e);
+      await userService.activate(req.params.link);
+      return res.redirect(
+        `${process.env.CLIENT_URL_PRODUCTION}/activate/${req.params.link}`
+      );
+    } catch (error) {
+      next(error);
     }
   }
 
@@ -73,9 +73,9 @@ class UserController {
         sameSite: "None",
         secure: true,
       });
-      return res.json(userData);
-    } catch (e) {
-      next(e);
+      return res.status(200).json(userData);
+    } catch (error) {
+      next(error);
     }
   }
 
@@ -83,9 +83,9 @@ class UserController {
     try {
       const { id, statistics } = req.body;
       const userData = await userService.updateStatistics(id, statistics);
-      return res.json(userData);
-    } catch (e) {
-      next(e);
+      return res.status(200).json(userData);
+    } catch (error) {
+      next(error);
     }
   }
 
@@ -93,36 +93,36 @@ class UserController {
     try {
       const { id, username, email } = req.body;
       const userData = await userService.updateUser(id, username, email);
-      return res.json(userData);
-    } catch (e) {
-      next(e);
+      return res.status(200).json(userData);
+    } catch (error) {
+      next(error);
     }
   }
 
   async getUsers(req, res, next) {
     try {
       const users = await userService.getAllUsers();
-      return res.json(users);
-    } catch (e) {
-      next(e);
+      return res.status(200).json(users);
+    } catch (error) {
+      next(error);
     }
   }
 
   async getUser(req, res, next) {
     try {
       const user = await userService.getUser(req.params.id);
-      return res.json(user);
-    } catch (e) {
-      next(e);
+      return res.status(200).json(user);
+    } catch (error) {
+      next(error);
     }
   }
 
   async deleteUser(req, res, next) {
     try {
-      const result = await userService.deleteUser(req.params.id);
-      return res.json(result);
-    } catch (e) {
-      next(e);
+      const isRemoved = await userService.deleteUser(req.params.id);
+      return res.status(200).json(isRemoved);
+    } catch (error) {
+      next(error);
     }
   }
 }

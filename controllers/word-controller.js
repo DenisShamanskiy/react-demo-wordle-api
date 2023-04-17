@@ -1,31 +1,30 @@
 const WordService = require("../service/word-service");
-// const WordModel = require("../models/word-model");
 
 class WordController {
   async getWords(req, res, next) {
     try {
       const words = await WordService.getWords();
-      res.json(words);
-    } catch (e) {
-      next(e);
+      return res.status(200).json(words);
+    } catch (error) {
+      next(error);
     }
   }
   async addWord(req, res, next) {
     try {
       const { word } = req.body;
-      const result = await WordService.addWord(word);
-      return res.json(result);
-    } catch (e) {
-      next(e);
+      const isAdded = await WordService.addWord(word);
+      return res.status(200).json(isAdded);
+    } catch (error) {
+      next(error);
     }
   }
   async deleteWord(req, res, next) {
     try {
       const { word } = req.body;
-      const result = await WordService.deleteWord(word);
-      return res.json(result);
-    } catch (e) {
-      next(e);
+      const isRemoved = await WordService.deleteWord(word);
+      return res.status(200).json(isRemoved);
+    } catch (error) {
+      next(error);
     }
   }
 
