@@ -8,11 +8,17 @@ const UserDto = require("../dtos/user-dto");
 const ApiError = require("../exceptions/api-error");
 
 class UserService {
-  async registration(email, password) {
+  async registration(email, password, username) {
     try {
-      const candidate = await UserModel.findOne({ email });
-      if (candidate) {
+      const candidateEmail = await UserModel.findOne({ email });
+      const candidateUsername = await UserModel.findOne({ username });
+      if (candidateEmail) {
         throw ApiError.BadRequest(`${email} уже зарегистрирован`);
+      }
+      if (candidateUsername) {
+        throw ApiError.BadRequest(
+          "Кто-то уже выбрал ваше имя.<br>Придумайте пожалуйста другое."
+        );
       }
       const hashPassword = await bcrypt.hash(password, 3);
       const activationLink = uuid.v4();
@@ -20,7 +26,7 @@ class UserService {
       const user = await UserModel.create({
         email,
         password: hashPassword,
-        username: email,
+        username,
         activationLink,
         roles: [userRole.value],
       });
